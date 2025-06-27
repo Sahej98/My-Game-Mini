@@ -1,15 +1,22 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
 require('dotenv').config();
-const express = require('express'), mongoose = require('mongoose'), cors = require('cors');
-const authRouter = require('./routes/authRoute'),
- userRouter = require('./routes/userRoute');
-const buildingsRouter = require('./routes/buildingRoute');
 
 const app = express();
-app.use(cors(), express.json());
-app.use('/api/auth', authRouter);
-app.use('/api/buildings', buildingsRouter);
-app.use('/api', userRouter);
+app.use(cors());
+app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => app.listen(process.env.PORT, () => console.log(`Server up on ${process.env.PORT}`)))
-  .catch(err => console.error('DB connection', err));
+const authRoutes = require('./routes/auth');
+const gameRoutes = require('./routes/game');
+
+app.use('/api/auth', authRoutes);
+app.use('/api/game', gameRoutes);
+
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log('MongoDB connected');
+    app.listen(5000, () => console.log('Server running on port 5000'));
+  })
+  .catch((err) => console.error(err));
